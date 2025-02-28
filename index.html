@@ -48,6 +48,20 @@
             vertical-align: middle !important;
             text-align: center;
         }
+        header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #fff; /* Màu nền để header không trong suốt */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Hiệu ứng bóng */
+    z-index: 1000; /* Đảm bảo header luôn nổi trên các phần khác */
+    padding: 10px 20px;
+}
+
+body {
+    padding-top: 60px; /* Đẩy nội dung xuống để không bị header che mất */
+}
     </style>
 </head>
 
