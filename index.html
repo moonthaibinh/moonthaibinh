@@ -54,6 +54,7 @@
 <body>
     <div class="container-fluid mt-3">
         <h6 class="text-center">Bảng lương</h6>
+        <h1 id="loadingtext" style="text-align: center;">Đang tải bảng lương, chờ xíu!!!</h1>
         <div class="table-responsive">
             <table class="table table-bordered table-sm">
                 <thead class="thead-light">
@@ -113,105 +114,109 @@
 
     <script>
         const lightColors = [
-    "#C8E6C9", // Xanh mint
-    "#B3E5FC", // Xanh baby (nhạt)
-    "#FFF9C4", // Vàng pastel
-    "#FFE0B2", // Cam nhạt
-    "#FFCDD2", // Hồng pastel
-    "#E1BEE7", // Tím lavender
-    "#F5F5F5", // Xám nhạt
-    "#A7FFEB", // Xanh bạc hà
-    "#D1C4E9", // Tím nhạt
-    "#FFECB3", // Vàng kem
-    "#C5CAE9", // Xanh tím nhạt
-    "#DCEDC8", // Xanh lá pastel
-    "#F8BBD0", // Hồng phấn nhạt
-    "#FFDDE1", // Hồng đào
-    "#E0F7FA"  // Xanh biển pastel
-];
+            "#C8E6C9", // Xanh mint
+            "#B3E5FC", // Xanh baby (nhạt)
+            "#FFF9C4", // Vàng pastel
+            "#FFE0B2", // Cam nhạt
+            "#FFCDD2", // Hồng pastel
+            "#E1BEE7", // Tím lavender
+            "#F5F5F5", // Xám nhạt
+            "#A7FFEB", // Xanh bạc hà
+            "#D1C4E9", // Tím nhạt
+            "#FFECB3", // Vàng kem
+            "#C5CAE9", // Xanh tím nhạt
+            "#DCEDC8", // Xanh lá pastel
+            "#F8BBD0", // Hồng phấn nhạt
+            "#FFDDE1", // Hồng đào
+            "#E0F7FA"  // Xanh biển pastel
+        ];
 
-console.log(lightColors);
+        console.log(lightColors);
 
         // Hàm đọc file JSON
         async function fetchData() {
             fetch("https://script.google.com/macros/s/AKfycbwbnpYPAZv0PePVxVyUC2CJy8qnZazkRyc6fIkOM4081JUxWTd3K5tQyOiEHWdfMlzoUA/exec")
-            .then(response => response.json()) // Chuyển dữ liệu về JSON
-            .then(data => {
-                try {
-                // let response = await fetch('data.json'); // Đọc file
-                // let data = await response.json(); // Chuyển thành JSON
-                console.log(data);
-                let listTho = new Array();
-                for (let index = 4; index < data[1].length; index++) {
-                    listTho.push(data[1][index]);
-                    document.getElementById('viewHeader').innerHTML += '<td style="background-color: '+lightColors[index-4]+'; font-weight: 700; text-align: center;">' + data[1][index] + '</td>'
-                }
-
-                let dataByNgay = new Array();
-                let countIndexNgay = 0;
-
-                for (let index = 2; index < data.length - 1; index++) {
-                    if (data[index][0] != "") {
-                        let dataNgay = {};
-                        dataNgay.ngay = data[index][0];
-                        dataNgay.tongBill = data[index][3];
-                    }
-                }
-
-                let dataView = document.getElementById('table-body')
-                dataView.innerHTML = '';
-
-                let currentDate = '';
-                let currentTongBill = '';
-                for (let index = 2; index < data.length - 1; index++) {
-                    let viewDong = '';
-
-                    if (currentDate) {
-                        if (data[index][0] && data[index][0] != currentDate) {
-                            currentDate = data[index][0]
-                            currentTongBill = data[index][3]
+                .then(response => response.json()) // Chuyển dữ liệu về JSON
+                .then(data => {
+                    try {
+                        // let response = await fetch('data.json'); // Đọc file
+                        // let data = await response.json(); // Chuyển thành JSON
+                        console.log(data);
+                        let listTho = new Array();
+                        for (let index = 4; index < data[1].length; index++) {
+                            listTho.push(data[1][index]);
+                            document.getElementById('viewHeader').innerHTML += '<td style="background-color: ' + lightColors[index - 4] + '; font-weight: 700; text-align: center;">' + data[1][index] + '</td>'
                         }
-                    } else {
-                        currentDate = data[index][0]
-                        currentTongBill = data[index][3]
-                    }
-                    data[index][0] = formatDate(currentDate);
-                    data[index][3] = currentTongBill
-                    for (let elm = 0; elm < data[index].length; elm++) {
-                        if (elm == 0) {
-                            viewDong += '<td style="text-align: center;">' + data[index][elm] + '</td>';
-                        } else {
-                            let background = '';
-                            if (elm >=4 && data[index][elm]) {
-                                background = 'background-color: '+lightColors[elm-4]+';';
+
+                        let dataByNgay = new Array();
+                        let countIndexNgay = 0;
+
+                        for (let index = 2; index < data.length - 1; index++) {
+                            if (data[index][0] != "") {
+                                let dataNgay = {};
+                                dataNgay.ngay = data[index][0];
+                                dataNgay.tongBill = data[index][3];
                             }
-                            viewDong += '<td style="text-align: center;'+background+'">' + formatNumber(data[index][elm]) + '</td>';
-
                         }
-                    }
-                    dataView.innerHTML += '<tr>' + viewDong + '</tr>';
-                }
-                mergeTableCells(); // Gọi hàm sau khi tải trang
 
-                let tongLuongView = document.getElementById('tongLuong')
-                tongLuongView.innerHTML = '';
-                let lastRe = data.length;
-                let tongLuongHtml = ''
-                tongLuongHtml += '                    <tr>\n' +
-                    '                        <td></td>\n' +
-                    '                        <td></td>\n' +
-                    '                        <td style="font-size: 12pt; font-weight: 700;">Lương</td>\n' +
-                    '                        <td></td>';
-                for (let index = 4; index < data[lastRe - 1].length; index++) {
-                    tongLuongHtml += '<td style="font-size: 11pt; font-weight: 700; text-align: center; background-color: '+lightColors[index-4]+';">' + formatNumber(data[lastRe - 1][index]) + '</td>\n'
-                }
-                tongLuongHtml += '</tr>';
-                tongLuongView.innerHTML = tongLuongHtml;
-            } catch (error) {
-                console.error("Lỗi tải dữ liệu:", error);
-            }
-            })
-            .catch(error => console.error("Lỗi:", error));
+                        let dataView = document.getElementById('table-body')
+                        dataView.innerHTML = '';
+
+                        let currentDate = '';
+                        let currentTongBill = '';
+                        for (let index = 2; index < data.length - 1; index++) {
+                            let viewDong = '';
+
+                            if (currentDate) {
+                                if (data[index][0] && data[index][0] != currentDate) {
+                                    currentDate = data[index][0]
+                                    currentTongBill = data[index][3]
+                                }
+                            } else {
+                                currentDate = data[index][0]
+                                currentTongBill = data[index][3]
+                            }
+                            data[index][0] = formatDate(currentDate);
+                            data[index][3] = currentTongBill
+                            for (let elm = 0; elm < data[index].length; elm++) {
+                                if (elm == 0) {
+                                    viewDong += '<td style="text-align: center;">' + data[index][elm] + '</td>';
+                                } else {
+                                    let background = '';
+                                    if (elm >= 4 && data[index][elm]) {
+                                        background = 'background-color: ' + lightColors[elm - 4] + ';';
+                                    }
+                                    viewDong += '<td style="text-align: center;' + background + '">' + formatNumber(data[index][elm]) + '</td>';
+
+                                }
+                            }
+                            dataView.innerHTML += '<tr>' + viewDong + '</tr>';
+                        }
+                        mergeTableCells(); // Gọi hàm sau khi tải trang
+
+                        let tongLuongView = document.getElementById('tongLuong')
+                        tongLuongView.innerHTML = '';
+                        let lastRe = data.length;
+                        let tongLuongHtml = ''
+                        tongLuongHtml += '                    <tr>\n' +
+                            '                        <td></td>\n' +
+                            '                        <td></td>\n' +
+                            '                        <td style="font-size: 12pt; font-weight: 700;">Lương</td>\n' +
+                            '                        <td></td>';
+                        for (let index = 4; index < data[lastRe - 1].length; index++) {
+                            tongLuongHtml += '<td style="font-size: 11pt; font-weight: 700; text-align: center; background-color: ' + lightColors[index - 4] + ';">' + formatNumber(data[lastRe - 1][index]) + '</td>\n'
+                        }
+                        tongLuongHtml += '</tr>';
+                        tongLuongView.innerHTML = tongLuongHtml;
+
+
+                    } catch (error) {
+                        console.error("Lỗi tải dữ liệu:", error);
+                    }
+
+                    document.getElementById('loadingtext').style.display = 'none'
+                })
+                .catch(error => console.error("Lỗi:", error));
 
         }
 
