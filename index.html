@@ -48,20 +48,15 @@
             vertical-align: middle !important;
             text-align: center;
         }
-        header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    background-color: #fff; /* Màu nền để header không trong suốt */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Hiệu ứng bóng */
-    z-index: 1000; /* Đảm bảo header luôn nổi trên các phần khác */
-    padding: 10px 20px;
-}
 
-body {
-    padding-top: 60px; /* Đẩy nội dung xuống để không bị header che mất */
-}
+        thead th {
+            position: sticky;
+            top: 0;
+            background-color: white;
+            /* Đảm bảo tiêu đề không bị trong suốt */
+            z-index: 10;
+            /* Giữ header trên cùng */
+        }
     </style>
 </head>
 
@@ -69,11 +64,12 @@ body {
     <div class="container-fluid mt-3">
         <h6 class="text-center">Bảng lương</h6>
         <h1 id="loadingtext" style="text-align: center;">Đang tải bảng lương, chờ xíu!!!</h1>
-        <div class="table-responsive">
+        <div class="table-responsive" style="max-height: 90vh; overflow-y: auto;">
             <table class="table table-bordered table-sm">
                 <thead class="thead-light">
                     <tr id="viewHeader">
-                        <th style="text-align: center;">Ngày</th>
+                        <th style="text-align: center;">
+                            Ngày</th>
                         <th style="text-align: center;">Tên khách</th>
                         <th style="text-align: center;">Tiền bill</th>
                         <th style="background-color: #e9ecef; font-weight: 700; text-align: center;">Tổng bill ngày</th>
@@ -152,85 +148,85 @@ body {
             fetch("https://script.google.com/macros/s/AKfycbwbnpYPAZv0PePVxVyUC2CJy8qnZazkRyc6fIkOM4081JUxWTd3K5tQyOiEHWdfMlzoUA/exec")
                 .then(response => response.json()) // Chuyển dữ liệu về JSON
                 .then(data => {
-                    try {
-                        // let response = await fetch('data.json'); // Đọc file
-                        // let data = await response.json(); // Chuyển thành JSON
-                        console.log(data);
-                        let listTho = new Array();
-                        for (let index = 4; index < data[1].length; index++) {
-                            listTho.push(data[1][index]);
-                            document.getElementById('viewHeader').innerHTML += '<td style="background-color: ' + lightColors[index - 4] + '; font-weight: 700; text-align: center;">' + data[1][index] + '</td>'
-                        }
+            try {
+                // let response = await fetch('data.json'); // Đọc file
+                // let data = await response.json(); // Chuyển thành JSON
+                console.log(data);
+                let listTho = new Array();
+                for (let index = 4; index < data[1].length; index++) {
+                    listTho.push(data[1][index]);
+                    document.getElementById('viewHeader').innerHTML += '<td style="background-color: ' + lightColors[index - 4] + '; font-weight: 700; text-align: center;position: sticky;top: 0;z-index: 10;">' + data[1][index] + '</td>'
+                }
 
-                        let dataByNgay = new Array();
-                        let countIndexNgay = 0;
+                let dataByNgay = new Array();
+                let countIndexNgay = 0;
 
-                        for (let index = 2; index < data.length - 1; index++) {
-                            if (data[index][0] != "") {
-                                let dataNgay = {};
-                                dataNgay.ngay = data[index][0];
-                                dataNgay.tongBill = data[index][3];
-                            }
-                        }
-
-                        let dataView = document.getElementById('table-body')
-                        dataView.innerHTML = '';
-
-                        let currentDate = '';
-                        let currentTongBill = '';
-                        for (let index = 2; index < data.length - 1; index++) {
-                            let viewDong = '';
-
-                            if (currentDate) {
-                                if (data[index][0] && data[index][0] != currentDate) {
-                                    currentDate = data[index][0]
-                                    currentTongBill = data[index][3]
-                                }
-                            } else {
-                                currentDate = data[index][0]
-                                currentTongBill = data[index][3]
-                            }
-                            data[index][0] = formatDate(currentDate);
-                            data[index][3] = currentTongBill
-                            for (let elm = 0; elm < data[index].length; elm++) {
-                                if (elm == 0) {
-                                    viewDong += '<td style="text-align: center;">' + data[index][elm] + '</td>';
-                                } else {
-                                    let background = '';
-                                    if (elm >= 4 && data[index][elm]) {
-                                        background = 'background-color: ' + lightColors[elm - 4] + ';';
-                                    }
-                                    viewDong += '<td style="text-align: center;' + background + '">' + formatNumber(data[index][elm]) + '</td>';
-
-                                }
-                            }
-                            dataView.innerHTML += '<tr>' + viewDong + '</tr>';
-                        }
-                        mergeTableCells(); // Gọi hàm sau khi tải trang
-
-                        let tongLuongView = document.getElementById('tongLuong')
-                        tongLuongView.innerHTML = '';
-                        let lastRe = data.length;
-                        let tongLuongHtml = ''
-                        tongLuongHtml += '                    <tr>\n' +
-                            '                        <td></td>\n' +
-                            '                        <td></td>\n' +
-                            '                        <td style="font-size: 12pt; font-weight: 700;">Lương</td>\n' +
-                            '                        <td></td>';
-                        for (let index = 4; index < data[lastRe - 1].length; index++) {
-                            tongLuongHtml += '<td style="font-size: 11pt; font-weight: 700; text-align: center; background-color: ' + lightColors[index - 4] + ';">' + formatNumber(data[lastRe - 1][index]) + '</td>\n'
-                        }
-                        tongLuongHtml += '</tr>';
-                        tongLuongView.innerHTML = tongLuongHtml;
-
-
-                    } catch (error) {
-                        console.error("Lỗi tải dữ liệu:", error);
+                for (let index = 2; index < data.length - 1; index++) {
+                    if (data[index][0] != "") {
+                        let dataNgay = {};
+                        dataNgay.ngay = data[index][0];
+                        dataNgay.tongBill = data[index][3];
                     }
+                }
 
-                    document.getElementById('loadingtext').style.display = 'none'
-                })
-                .catch(error => console.error("Lỗi:", error));
+                let dataView = document.getElementById('table-body')
+                dataView.innerHTML = '';
+
+                let currentDate = '';
+                let currentTongBill = '';
+                for (let index = 2; index < data.length - 1; index++) {
+                    let viewDong = '';
+
+                    if (currentDate) {
+                        if (data[index][0] && data[index][0] != currentDate) {
+                            currentDate = data[index][0]
+                            currentTongBill = data[index][3]
+                        }
+                    } else {
+                        currentDate = data[index][0]
+                        currentTongBill = data[index][3]
+                    }
+                    data[index][0] = formatDate(currentDate);
+                    data[index][3] = currentTongBill
+                    for (let elm = 0; elm < data[index].length; elm++) {
+                        if (elm == 0) {
+                            viewDong += '<td style="text-align: center;">' + data[index][elm] + '</td>';
+                        } else {
+                            let background = '';
+                            if (elm >= 4 && data[index][elm]) {
+                                background = 'background-color: ' + lightColors[elm - 4] + ';';
+                            }
+                            viewDong += '<td style="text-align: center;' + background + '">' + formatNumber(data[index][elm]) + '</td>';
+
+                        }
+                    }
+                    dataView.innerHTML += '<tr>' + viewDong + '</tr>';
+                }
+                mergeTableCells(); // Gọi hàm sau khi tải trang
+
+                let tongLuongView = document.getElementById('tongLuong')
+                tongLuongView.innerHTML = '';
+                let lastRe = data.length;
+                let tongLuongHtml = ''
+                tongLuongHtml += '                    <tr>\n' +
+                    '                        <td></td>\n' +
+                    '                        <td></td>\n' +
+                    '                        <td style="font-size: 12pt; font-weight: 700;">Lương</td>\n' +
+                    '                        <td></td>';
+                for (let index = 4; index < data[lastRe - 1].length; index++) {
+                    tongLuongHtml += '<td style="font-size: 11pt; font-weight: 700; text-align: center; background-color: ' + lightColors[index - 4] + ';">' + formatNumber(data[lastRe - 1][index]) + '</td>\n'
+                }
+                tongLuongHtml += '</tr>';
+                tongLuongView.innerHTML = tongLuongHtml;
+
+
+            } catch (error) {
+                console.error("Lỗi tải dữ liệu:", error);
+            }
+
+            document.getElementById('loadingtext').style.display = 'none'
+            })
+            .catch(error => console.error("Lỗi:", error));
 
         }
 
