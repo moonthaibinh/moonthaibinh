@@ -30,6 +30,7 @@
         .table th,
         .table td {
             padding: 6px;
+            border: 1px solid black;
             /* Giảm khoảng cách giữa nội dung */
         }
 
@@ -174,6 +175,7 @@
 
                 let currentDate = '';
                 let currentTongBill = '';
+                let boiMau = false;
                 for (let index = 2; index < data.length - 1; index++) {
                     let viewDong = '';
 
@@ -181,6 +183,7 @@
                         if (data[index][0] && data[index][0] != currentDate) {
                             currentDate = data[index][0]
                             currentTongBill = data[index][3]
+                            let boiMau = true;
                         }
                     } else {
                         currentDate = data[index][0]
@@ -190,7 +193,7 @@
                     data[index][3] = currentTongBill
                     for (let elm = 0; elm < data[index].length; elm++) {
                         if (elm == 0) {
-                            viewDong += '<td style="text-align: center;">' + data[index][elm] + '</td>';
+                            viewDong += '<td style="text-align: center; class="'+boiMau+'">' + data[index][elm] + '</td>';
                         } else {
                             let background = '';
                             if (elm >= 4 && data[index][elm]) {
@@ -235,30 +238,37 @@
     </script>
 
     <script>
-        function mergeTableCells() {
-            let table = document.getElementById("table-body");
-            let rows = table.getElementsByTagName("tr");
-            let prevCell = null;
-            let prevCellTongBill = null;
-            let rowspan = 1;
+function mergeTableCells() {
+    let table = document.getElementById("table-body");
+    let rows = table.getElementsByTagName("tr");
+    let prevCell = null;
+    let prevCellTongBill = null;
+    let rowspan = 1;
+    let currentColorIndex = 0;
+    let colors = ["#d9d2e9", "#ffffff"]; // Màu nền xen kẽ
 
-            for (let i = 0; i < rows.length; i++) {
-                let currentCell = rows[i].cells[0]; // Cột "Ngày"
-                let cellTongBill = rows[i].cells[3]; // Cột "Ngày"
+    for (let i = 0; i < rows.length; i++) {
+        let currentCell = rows[i].cells[0]; // Cột "Ngày"
+        let cellTongBill = rows[i].cells[3]; // Cột "Tiền bill"
 
-                if (prevCell && prevCell.textContent === currentCell.textContent) {
-                    rowspan++;
-                    prevCell.rowSpan = rowspan;
-                    prevCellTongBill.rowSpan = rowspan;
-                    currentCell.style.display = "none"; // Ẩn ô trùng
-                    cellTongBill.style.display = "none"; // Ẩn ô trùng
-                } else {
-                    prevCell = currentCell;
-                    prevCellTongBill = cellTongBill;
-                    rowspan = 1;
-                }
-            }
+        if (prevCell && prevCell.textContent === currentCell.textContent) {
+            rowspan++;
+            prevCell.rowSpan = rowspan;
+            prevCellTongBill.rowSpan = rowspan;
+            currentCell.style.display = "none"; // Ẩn ô trùng
+            cellTongBill.style.display = "none"; // Ẩn ô trùng
+        } else {
+            prevCell = currentCell;
+            prevCellTongBill = cellTongBill;
+            rowspan = 1;
+            currentColorIndex = 1 - currentColorIndex; // Đổi màu xen kẽ
         }
+
+        // Tô màu nền cho nhóm hàng giống nhau
+        rows[i].style.backgroundColor = colors[currentColorIndex];
+    }
+}
+
 
         function formatDate(dateString) {
             let date = new Date(dateString);
